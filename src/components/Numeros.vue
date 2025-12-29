@@ -1,8 +1,19 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12" class="pa-0 pb-4">
+      <v-col cols="12" class="pa-0 pb-4 d-flex justify-space-between align-center">
         <span class="text-h4">Aposta</span>
+        <div style="width: 200px">
+          <v-select
+            label="Dezenas"
+            :items="dezenasOptions"
+            :model-value="qtdeDezenas"
+            @update:model-value="$emit('update:qtdeDezenas', $event)"
+            variant="outlined"
+            density="compact"
+            hide-details
+          ></v-select>
+        </div>
       </v-col>
       <v-col v-for="(field, index) in fields" :key="index" class="pa-0 d-flex align-center" md="2">
         <v-text-field
@@ -29,11 +40,16 @@ export default {
   props: {
     listNumberSelect: {
       type: Array
+    },
+    qtdeDezenas: {
+      type: Number,
+      default: 6
     }
   },
   data() {
     return {
-      fields: Array(6).fill("0") // Array com 6 strings representando os valores dos campos
+      fields: Array(this.qtdeDezenas).fill("0"), // Array com strings representando os valores dos campos
+      dezenasOptions: Array.from({ length: 15 }, (_, i) => i + 6)
     };
   },
   watch: {

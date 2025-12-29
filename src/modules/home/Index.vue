@@ -1,12 +1,25 @@
 <template>
   <v-row class="pa-10">
     <v-col cols="12" md="6" lg="6">
-      <Numeros :listNumberSelect="numberSelect" />
-      <Volante @numberSelect="insertNumber($event)" @listAposta="insertAposta($event)" />
+      <Numeros
+        :listNumberSelect="numberSelect"
+        :qtdeDezenas="qtdeDezenas"
+        @update:qtdeDezenas="qtdeDezenas = $event"
+      />
+      <Volante
+        @numberSelect="insertNumber($event)"
+        @novaAposta="insertAposta($event)"
+        :maxSelection="qtdeDezenas"
+      />
     </v-col>
     <v-col cols="12" md="6" lg="6">
       <Resultado @resultado="getResultado($event)" />
-      <Apostas :listAposta="list" :resultado="resultado" />
+      <Apostas
+        :listAposta="list"
+        :resultado="resultado"
+        @cleanList="list = []"
+        @deleteAposta="deleteAposta($event)"
+      />
     </v-col>
   </v-row>
 </template>
@@ -28,17 +41,43 @@ export default {
     return {
       numberSelect: [],
       list: [],
-      resultado: []
+      resultado: [],
+      qtdeDezenas: 6,
+      resultado: [],
+      qtdeDezenas: 6
     };
+  },
+  mounted() {
+    const savedList = localStorage.getItem("loterias_apostas");
+    if (savedList) {
+      try {
+        this.list = JSON.parse(savedList);
+        this.sortBets();
+      } catch (e) {
+        console.error("Erro ao carregar apostas", e);
+      }
+    }
+  },
+  watch: {
+    qtdeDezenas(newVal) {
+      const validNums = this.numberSelect.filter((n) => n != 0);
+      this.insertNumber(validNums);
+    },
+    list: {
+      handler(newVal) {
+        localStorage.setItem("loterias_apostas", JSON.stringify(newVal));
+      },
+      deep: true
+    }
   },
 
   methods: {
     insertNumber(event) {
       this.numberSelect = [...event];
-      if (this.numberSelect.length < 6) {
+      if (this.numberSelect.length < this.qtdeDezenas) {
         // Calcular a quantidade de posições que precisam ser preenchidas com 0
 
-        const qtdZeros = 6 - this.numberSelect.length;
+        const qtdZeros = this.qtdeDezenas - this.numberSelect.length;
 
         // Preencher as posições restantes com 0
         for (let i = 0; i < qtdZeros; i++) {
@@ -47,11 +86,18 @@ export default {
       }
     },
     insertAposta(event) {
-      this.list = [...event];
-      this.numberSelect = Array(6).fill("0");
+      this.list.push(event);
+      this.sortBets();
+      this.numberSelect = Array(this.qtdeDezenas).fill("0");
     },
     getResultado(event) {
       this.resultado = [...event];
+    },
+    deleteAposta(index) {
+      this.list.splice(index, 1);
+    },
+    sortBets() {
+      this.list.sort((a, b) => a.length - b.length);
     }
   }
 };

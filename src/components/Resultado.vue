@@ -1,8 +1,9 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12" class="pa-0 pb-4">
+      <v-col cols="12" class="pa-0 pb-4 d-flex justify-space-between align-center">
         <span class="text-h4">Resultado</span>
+        <v-btn color="error" variant="text" @click="cleanFields">Limpar</v-btn>
       </v-col>
       <v-col v-for="(field, index) in fields" :key="index" class="pa-0 d-flex align-center" md="2">
         <v-text-field
@@ -66,6 +67,10 @@ export default {
       if (!this.fields[index]) {
         this.fields[index] = "00";
       }
+    },
+    cleanFields() {
+      this.fields = Array(6).fill("00");
+      this.$emit("resultado", this.fields);
     }
   }
 };

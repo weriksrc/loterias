@@ -4,7 +4,7 @@
       <v-col cols="12" class="pa-0 pb-4">
         <span class="text-h6">Volante</span>
       </v-col>
-      <v-col class="pa-2 pl-0" v-for="number in numbers" :key="number" cols="12" md="1" lg="1">
+      <v-col class="pa-2 pl-0 volante-col" v-for="number in numbers" :key="number" cols="12">
         <v-btn
           :disabled="isButtonDisabled(number)"
           rounded
@@ -17,7 +17,7 @@
         <v-btn
           @click="addToList"
           color="success"
-          :disabled="clickedButtons.length < 6"
+          :disabled="clickedButtons.length < maxSelection"
         >Adicionar à Lista</v-btn>
       </v-col>
     </v-row>
@@ -26,11 +26,16 @@
 
 <script>
 export default {
+  props: {
+    maxSelection: {
+      type: Number,
+      default: 6
+    }
+  },
   data() {
     return {
       numbers: Array.from({ length: 60 }, (_, index) => index + 1),
-      clickedButtons: [],
-      addedLists: []
+      clickedButtons: []
     };
   },
   methods: {
@@ -40,8 +45,8 @@ export default {
         const index = this.clickedButtons.indexOf(number);
         this.clickedButtons.splice(index, 1);
       } else {
-        // Se já foram clicados 6 botões, não fazer nada
-        if (this.clickedButtons.length >= 6) {
+        // Se já foram clicados maxSelection botões, não fazer nada
+        if (this.clickedButtons.length >= this.maxSelection) {
           return;
         }
 
@@ -59,15 +64,15 @@ export default {
     isButtonDisabled(number) {
       // Desativar botões após clicar em 6
       return (
-        this.clickedButtons.length >= 6 && !this.clickedButtons.includes(number)
+        this.clickedButtons.length >= this.maxSelection && !this.clickedButtons.includes(number)
       );
     },
     addToList() {
       // Adicionar a lista de botões clicados à nova lista
-      this.addedLists.push([...this.clickedButtons]);
+      const aposta = [...this.clickedButtons];
       // Limpar a lista de botões clicados
       this.clickedButtons = [];
-      this.$emit("listAposta", this.addedLists);
+      this.$emit("novaAposta", aposta);
     },
     formatNumber(number) {
       // Adicionar zero à esquerda se o número for menor que 10
@@ -78,6 +83,13 @@ export default {
 </script>
 
 <style>
+@media (min-width: 960px) {
+  .volante-col {
+    flex: 0 0 10% !important;
+    max-width: 10% !important;
+  }
+}
+
 .initial-button {
   background-color: #eeeeee !important;
 }
