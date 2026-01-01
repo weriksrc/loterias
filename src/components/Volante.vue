@@ -13,6 +13,16 @@
           @click="handleButtonClick(number)"
         >{{ formatNumber(number) }}</v-btn>
       </v-col>
+    <v-col cols="12" class="px-0 pt-4">
+        <v-text-field
+          v-model="label"
+          label="Rótulo da Aposta (Opcional)"
+          variant="outlined"
+          density="compact"
+          hide-details
+          placeholder="Ex: Bolão da Firma"
+        ></v-text-field>
+      </v-col>
       <v-col cols="12" class="px-0 py-4">
         <v-btn
           @click="addToList"
@@ -35,7 +45,8 @@ export default {
   data() {
     return {
       numbers: Array.from({ length: 60 }, (_, index) => index + 1),
-      clickedButtons: []
+      clickedButtons: [],
+      label: "Bolão Firma"
     };
   },
   methods: {
@@ -68,10 +79,16 @@ export default {
       );
     },
     addToList() {
-      // Adicionar a lista de botões clicados à nova lista
-      const aposta = [...this.clickedButtons];
-      // Limpar a lista de botões clicados
+      // Adicionar a lista de botões clicados à nova lista e o rótulo
+      const aposta = {
+        numbers: [...this.clickedButtons],
+        label: this.label
+      };
+      
+      // Limpar a lista de botões clicados e o rótulo
       this.clickedButtons = [];
+      this.label = "";
+      
       this.$emit("novaAposta", aposta);
     },
     formatNumber(number) {

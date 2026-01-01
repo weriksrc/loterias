@@ -7,8 +7,12 @@
       </v-col>
       <v-col cols="12" class="pa-0">
         <v-list class="pa-0">
-          <v-list-item v-for="(list, index) in listAposta" :key="index" class="pa-0">
-            <v-list-item-content class="d-flex align-center">
+          <v-list-item v-for="(bet, index) in listAposta" :key="index" class="pa-0">
+            <v-list-item-content class="d-flex align-center flex-wrap">
+              <div class="d-flex align-center mr-4" style="min-width: 100px" v-if="bet.label">
+                 <span class="text-caption text-grey">Rótulo:</span>
+                 <span class="ml-1 font-weight-bold">{{ bet.label }}</span>
+              </div>
               <v-btn
                 icon
                 variant="text"
@@ -20,7 +24,7 @@
                 <v-icon>mdi-trash-can-outline</v-icon>
               </v-btn>
               <span
-                v-for="(number, i) in ordenarLista(list)"
+                v-for="(number, i) in ordenarLista(bet.numbers)"
                 :key="i"
                 class="mr-2"
                 :class="colorNumber(number) ? 'bgcolor' : ''"
@@ -30,10 +34,10 @@
                 v-if="resultado && resultado.length > 0"
                 class="ml-2"
                 size="small"
-                :color="getCorAcertos(calcularAcertos(list))"
+                :color="getCorAcertos(calcularAcertos(bet.numbers))"
                 text-color="white"
               >
-                {{ calcularAcertos(list) }} acertos
+                {{ calcularAcertos(bet.numbers) }} acertos
               </v-chip>
             </v-list-item-content>
           </v-list-item>

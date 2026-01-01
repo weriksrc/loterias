@@ -51,7 +51,18 @@ export default {
     const savedList = localStorage.getItem("loterias_apostas");
     if (savedList) {
       try {
-        this.list = JSON.parse(savedList);
+        const parsedList = JSON.parse(savedList);
+        // Migration for legacy array-only bets
+        this.list = parsedList.map(item => {
+          if (Array.isArray(item)) {
+            return { numbers: item, label: "Bolão Firma" };
+          }
+          // Apply default label to existing bets if missing
+          if (!item.label) {
+            item.label = "Bolão Firma";
+          }
+          return item;
+        });
         this.sortBets();
       } catch (e) {
         console.error("Erro ao carregar apostas", e);
@@ -97,7 +108,7 @@ export default {
       this.list.splice(index, 1);
     },
     sortBets() {
-      this.list.sort((a, b) => a.length - b.length);
+      this.list.sort((a, b) => a.numbers.length - b.numbers.length);
     }
   }
 };
